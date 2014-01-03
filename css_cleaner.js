@@ -12,8 +12,6 @@ var jsdom = require("jsdom");
 var css=require("css");
 
 var jquery = fs.readFileSync("./jquery.js", "utf-8");
-//var url="http://localhost/63110456/";
-//var url="http://www.24ur.com/";
 if(!process.argv[2]){
 	console.log("You need to specify html file.");
 	process.exit(code=0);
@@ -122,7 +120,7 @@ function main(url){
 					fs.writeFileSync("optimizedCSS.css", css.stringify(obj));
 					
 				    getClasses(window,classes);
-				    //console.log(minimized);
+				    
 				    if(compression!='compressionOff'){
 					    new compressor.minify({
 	    					type: 'yui-css',
@@ -293,7 +291,7 @@ function simple(selector,window){
 			
 	while((match=dividers.exec(selector))!==null){
 		var div=match[0];
-		//console.log(match);
+		
 		word=selector.substring(a,match.index);
 		if(div.length<=1){
 			if(word.length>0){
@@ -1031,7 +1029,7 @@ function checkSelectorAtributes(word,attr,obj,classes,distance){
 					if(obj[array[i]].length>0){
 						var attributes=obj[array[i]];
 						for (var j = 0; j < attributes.length; j++) {
-							//console.log(attributes[j]);
+							
 							var distancedl=DamerauLevenshteinDistance(word.toLowerCase(), attributes[j]);
 							if(distancedl<closest){
 								closest=distancedl;

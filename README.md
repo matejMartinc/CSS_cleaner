@@ -6,7 +6,7 @@ CSS_cleaner
 What is CSS_cleaner?
 --------------------
 
-CSS_cleaner is a program that checks html document on specific url (could be on local server on not) for css files, 
+CSS_cleaner is a program that checks html document on specific url (could be on local server or not) for css files, 
 which are then combined, validated and cleaned. CSS_cleaner detects selectors,
 that are not legit and fixes them, removes unused selectors, simplifies overspecified
 selectors, removes or combines duplicated selectors and finds classes in HTML file that 

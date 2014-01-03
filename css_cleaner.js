@@ -106,6 +106,8 @@ function main(url){
     				}
     				else
     					deletion=false;
+    				if(deletion)
+    					console.log("deletion of unused selectors");
     				delSelectors(sheet,window,deletion);
     				
     				
@@ -790,7 +792,6 @@ function validate(selector,classes, distance){
 	var counter=0;
 	while((matchcomment=commentdiv.exec(selector))!==null){
 		comment+=matchcomment[0];
-		console.log(comment+"jej");
 		selector=selector.substring(counter,matchcomment.index)+selector.substring(matchcomment.index+matchcomment[0].length);
 		counter=matchcomment.index+matchcomment[0].length;
 	}

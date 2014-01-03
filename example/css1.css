@@ -1,0 +1,177 @@
+
+@namespace url(http://www.w3.org/1999/xhtml);
+
+
+foo|bar {
+  margin: auto;
+}
+
+
+
+body{
+	margin: auto;
+	padding: 0;
+}
+p{font-family:Calibri, Times, serif;} 
+h2{font-family:Calibri, Times, serif;} 
+li{font-family:Calibri, Times, serif;} 
+
+
+
+#cloud1 form{
+    float:right;
+	color:#FFFFFF;
+}	
+#cloud1{
+    width:1330px;
+	margin:auto;
+	padding:5px;
+	background-color:#610B0B;
+	height:25px;
+	color:white;
+}	
+#cloud2{
+    width:778px;
+	height:760px;
+	margin:auto;
+	padding:10px;
+	background-color:white;
+	height:100px;
+	border: 1px solid #610B0B;
+	border-bottom-right-radius: 10px;
+	border-bottom-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-top-left-radius: 10px;
+}
+#cloud3 p{
+    color: #610B0B;
+}
+
+
+#cloud4 input     [type="text"]
+{
+    width:210px;
+    margin:3px;
+	margin-left:0px;
+	color:#610B0B;
+}
+#cloud5 input[type="file"]
+{
+    width:208px;
+    margin:3px;
+	margin-left:0px;
+	color:#610B0B;
+}
+
+#cloud6 
+input[type="submit"]
+{
+    color:#610B0B;
+	width:180px;
+	height:28px;
+    margin-left:0px;
+	background:#E0E0E0;
+	border:0;
+	font-family:Calibri, Times, serif;
+}
+	
+
+[target]
+{
+    background-color:yellow;
+}
+go[foo|target=_blank] 
+[hruf=something] p[hruf=something]  >divi
+{
+background-color:yellow;
+} 
+[class|="flower"]
+{
+background-color:yellow;
+} 
+[langi| =en]
+{
+background-color:yellow;
+} 
+
+p first-child
+{
+background-color:yellow;
+}
+p frost-child
+{
+background-color:green;
+}
+
+div .somethingOne{background-color:yellow;}
+divec .somethingOne{background-color:green;}
+divec .somethingTwo{background-color:yellow;}
+divec .somethingFour.somethingFive{background-color:green;}
+divec .somethingFive.somethingSix{color:green;}
+
+dive[class="head"] > ab{
+	background-color:yellow;
+}
+
+#head:-webkit-something{
+    margin:auto;
+	height:280px;
+	width:1340px;
+}
+
+#head:-webkit-something{
+    margin:auto;
+	height:280px;
+	width:1340px;
+}
+
+:first-child{font-family:Calibri, Times, serif;} 
+
+#cat{
+	background-color:yellow;
+	
+}
+
+foo|a:before:first-child{
+	background-color:yellow;
+	
+}
+
+foo|a:before:before > go|a::ater zo|a::trget:target{
+	background-color:yellow;
+	
+}
+
+
+#tree{
+	background-color:yellow;
+	
+}
+a:hover{
+	background-color:yellow;
+	
+}
+
+#head #tree{
+    margin:auto;
+	height:280px;
+	width:1340px;
+}
+
+
+*|*{
+    margin:auto;
+	height:280px;
+	width:1340px;
+}
+
+#head ~ h1 [href][href]    > a +   a [href][src][src]{
+    margin:auto;
+	height:280px;
+	width:1340px;
+}
+
+
+
+
+

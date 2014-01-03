@@ -1,0 +1,127 @@
+@charset "<IANA-defined-charset-name>";
+
+@import url("other.css");
+
+@namespace svg url(http://www.w3.org/2000/haha);
+
+@namespace url(http://www.w3.org/1999/xhtml);
+
+@font-face {
+  font-family: "Example Font";
+  src: url("http://www.example.com/fonts/example");
+}
+
+#head1 #avto {
+  margin: auto;
+  height: 280px;
+  width: 640px;
+}
+
+@media screen, projection {
+  div {
+    background: #fffef0;
+    color: #300;
+  }
+
+  body {
+    max-width: 35em;
+    margin: 0 auto;
+  }
+
+  .somethingOne {
+    background-color: blue;
+    color: #300;
+  }
+
+  .somethingTwo {
+    background-color: green;
+  }
+}
+
+@supports (display:flex) {
+  .somethingTwo {
+    background-color: green;
+  }
+
+  .somethingOne {
+    background-color: blue;
+  }
+}
+
+@document url(http://www.w3.org/),
+               url-prefix(http://www.w3.org/Style/),
+               domain(mozilla.org),
+               regexp("https:.*")  {
+
+}
+
+:dir(rtl) {
+  background-color: yellow;
+}
+
+a,
+h1 {
+  background-color: yellow;
+}
+
+body {
+  margin: auto;
+  padding: 0;
+}
+
+p {
+  font-family: Calibri, Times, serif;
+}
+
+h2 {
+  font-family: Calibri, Times, serif;
+}
+
+#cloud1 {
+  width: 1330px;
+  margin: auto;
+  padding: 5px;
+  background-color: #610B0B;
+  height: 25px;
+  color: white;
+}
+
+#cloud2 {
+  width: 778px;
+  height: 760px;
+  margin: auto;
+  padding: 10px;
+  background-color: white;
+  height: 100px;
+  border: 1px solid #610B0B;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
+[target] {
+  background-color: yellow;
+}
+
+.somethingOne {
+  background-color: green;
+}
+
+.somethingTwo {
+  background-color: yellow;
+}
+
+:first-child {
+  font-family: Calibri, Times, serif;
+}
+
+a:hover {
+  background-color: yellow;
+}
+
+* {
+  margin: auto;
+  height: 280px;
+  width: 1340px;
+}

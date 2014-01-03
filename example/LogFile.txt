@@ -1,0 +1,193 @@
+Program found next css files on the page: 
+
+http://localhost/celtra/css2.css
+http://localhost/celtra/css1.css
+
+
+VALIDATION:___________________________________________________________________________
+
+
+Selector 'htmle dive' was changed to 'html div'.
+
+Selector 'bodi' was changed to 'body'.
+
+Selector 'divec .somethingOne' was changed to 'div .somethingOne'.
+
+Selector 'divec .somethingOne' was changed to 'div .somethingOne'.
+
+Selector 'divec .somethingOne' was changed to 'div .somethingOne'.
+
+Selector 'divec .somethingTwo' was changed to 'div .somethingTwo'.
+
+Selector 'divec .somethingTwo' was changed to 'div .somethingTwo'.
+
+Selector ':::ntht-child(20)' was changed to ':nth-child(20)'.
+
+Selector 'dive sections' was changed to 'div section'.
+
+Selector ':::ntht-child(20)' was changed to ':nth-child(20)'.
+
+Selector 'divec .somethingTwo' was changed to 'div .somethingTwo'.
+
+Selector 'divec .somethingTwo' was changed to 'div .somethingTwo'.
+
+Selector 'divec .somethingOne' was changed to 'div .somethingOne'.
+
+Selector 'h bodi' was changed to 'h1 body'.
+
+Selector ':::ntht-child(20)' was changed to ':nth-child(20)'.
+
+Selector ':::ntht-child(20)' was changed to ':nth-child(20)'.
+
+Selector '.dropdown-login input[type="text"]:focis input[type="text"]:focus' was changed to '.dropdown-login input[type="text"]:focus input[type="text"]:focus'.
+
+Selector 'foo|bar' was changed to 'footer'.
+
+Selector '#cloud4 input     [type="text"]' was changed to '#cloud4 input [type="text"]'.
+
+Selector '#cloud6 
+input[type="submit"]' was changed to '#cloud6 input[type="submit"]'.
+
+Selector 'go[foo|target=_blank] 
+[hruf=something] p[hruf=something]  >divi' was changed to 'mo[mo=_blank] [href=something] p[dir=something] >div'.
+
+Selector '[langi| =en]' was changed to '[lang=en]'.
+
+Selector 'divec .somethingOne' was changed to 'div .somethingOne'.
+
+Selector 'divec .somethingTwo' was changed to 'div .somethingTwo'.
+
+Selector 'divec .somethingFour.somethingFive' was changed to 'div .somethingFour.somethingFive'.
+
+Selector 'divec .somethingFive.somethingSix' was changed to 'div .somethingFive.somethingSix'.
+
+Selector 'dive[class="head"] > ab' was changed to 'div[class="head"] > a'.
+
+Selector 'foo|a:before:first-child' was changed to 'footer:before:first-child'.
+
+Selector 'foo|a:before:before > go|a::ater zo|a::trget:target' was changed to 'footer:before:before > meta::after meta:target:target'.
+
+Selector '*|*' was changed to '*'.
+
+Selector '#head ~ h1 [href][href]    > a +   a [href][src][src]' was changed to '#head ~ h1 [href][href] > a + a [href][src][src]'.
+
+
+
+FINDING AND COMBINING/DELETING DUPLICATED DECLARATIONS:_______________________________
+
+
+Selector 'div .somethingOne' was duplicated.
+
+Selector 'div .somethingOne' was duplicated.
+
+Selector 'div .somethingTwo' was duplicated.
+
+Selector 'div .somethingTwo' was duplicated.
+
+Selector 'div .somethingOne' was duplicated.
+
+Selector '#head:-webkit-something' was duplicated.
+
+
+
+DELETION OF UNUSED SELECTORS:_____________________________________________________
+
+
+#head:-moz-neki
+
+#head:-webkit-neki
+
+#car
+
+#cow
+
+:nth-child(20)
+
+div section
+
+:nth-child(20)
+
+h1 body
+
+:nth-child(20)
+
+:nth-child(20)
+
+a[data-a]
+
+input[type="text"]
+
+.dropdown-login input[type="text"]:focus input[type="text"]:focus
+
+footer
+
+li
+
+#cloud1 form
+
+#cloud3 p
+
+#cloud4 input [type="text"]
+
+#cloud5 input[type="file"]
+
+#cloud6 input[type="submit"]
+
+mo[mo=_blank] [href=something] p[dir=something] >div
+
+[class|="flower"]
+
+[lang=en]
+
+p first-child
+
+p frost-child
+
+div .somethingFour.somethingFive
+
+div .somethingFive.somethingSix
+
+div[class="head"] > a
+
+#head:-webkit-something
+
+#cat
+
+footer:before:first-child
+
+footer:before:before > meta::after meta:target:target
+
+#tree
+
+#head #tree
+
+#head ~ h1 [href][href] > a + a [href][src][src]
+
+
+
+SIMPLIFICATION OF SELECTORS:______________________________________________________
+
+
+Replaced 'html div' with 'div'.
+
+Replaced 'div .somethingOne' with '.somethingOne'.
+
+Replaced 'div .somethingTwo' with '.somethingTwo'.
+
+Replaced 'div .somethingTwo' with '.somethingTwo'.
+
+Replaced 'div .somethingOne' with '.somethingOne'.
+
+Replaced 'div .somethingOne' with '.somethingOne'.
+
+Replaced 'div .somethingTwo' with '.somethingTwo'.
+
+
+
+CLASSES ON PAGE THAT ARE NOT DECLARED IN CSS:_________________________________________
+
+
+somethingThree
+
+thumb-link
+

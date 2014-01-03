@@ -1,0 +1,124 @@
+@namespace svg url(http://www.w3.org/2000/haha);
+@charset "<IANA-defined-charset-name>";
+
+@font-face {
+  font-family: "Example Font";
+  src: url("http://www.example.com/fonts/example");
+}
+@import url("other.css");
+
+#head:-moz-neki{
+    margin:auto;
+	height:280px;
+	width:1340px;
+}
+
+
+
+#head:-webkit-neki{
+    margin:auto;
+	height:280px;
+	width:1340px;
+}
+#head1 #avto{
+    margin:auto;
+	height:280px;
+	width:640px;
+
+}
+
+#car{ }{
+	margin:auto;
+	height:280px;
+	width:640px;
+
+}
+
+#cow{
+	width:800px;
+	margin:auto;
+	background-color:#610B0B;
+	height:35px;
+	border-top-right-radius: 10px;
+	border-top-left-radius: 10px;
+	
+	
+	
+	
+}
+@media screen, projection {
+	htmle dive {
+    	background: #fffef0;
+    	color: #300;
+  	}
+  	bodi {
+    	max-width: 35em;
+    	margin: 0 auto;
+  	}
+  	divec .somethingOne{background-color:green;}
+  	divec .somethingOne{background-color:blue;}
+  	divec .somethingOne{color: #300;}
+  	divec .somethingTwo{background-color:yellow;}
+	divec .somethingTwo{background-color:green;}
+  	:::ntht-child(20){
+	background-color:yellow;
+	
+}  
+}
+@supports (display:flex) {
+  	dive sections { display: flex }
+  	:::ntht-child(20){
+	background-color:yellow;
+	}
+	divec .somethingTwo{background-color:green;}
+	divec .somethingTwo{background-color:green;}
+  	divec .somethingOne{background-color:blue;}
+  	
+  
+}
+
+
+
+@document url(http://www.w3.org/),
+               url-prefix(http://www.w3.org/Style/),
+               domain(mozilla.org),
+               regexp("https:.*")
+{
+  
+  h bodi { color: purple; background: yellow; }
+  :::ntht-child(20){
+	background-color:yellow;
+	
+	}
+	{background-color:green;}
+	
+}
+
+
+:dir(rtl){
+	background-color:yellow;
+}
+
+
+:::ntht-child(20){
+	background-color:yellow;
+	
+}
+
+a[data-a]{
+	background-color:yellow;
+}
+a, h1{
+	background-color:yellow;
+}
+
+input[type="text"]{
+	margin:auto;
+	height:280px;
+	width:1340px;
+}
+.dropdown-login input[type="text"]:focis input[type="text"]:focus{
+	margin:auto;
+	height:280px;
+	width:1340px;
+}

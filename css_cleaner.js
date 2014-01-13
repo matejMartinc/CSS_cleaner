@@ -589,7 +589,7 @@ function convertCssToJquery(selector,list){
 	while((match1=div1.exec(specialSelector))!==null){
 		//break combined pseudo classes and elements into parts
 		singleSpecialSelector=specialSelector.substring(a,match1.index);
-		if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz")){
+		if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz") && !under.str.startsWith(singleSpecialSelector,"::-webkit") && !under.str.startsWith(singleSpecialSelector,"::-moz")){
 			//check for brackets and remove content inside brackets for easier comparison
 			var div=/\(([^\)]*)\)+/;
 			var insideBrackets="";
@@ -619,7 +619,7 @@ function convertCssToJquery(selector,list){
 	}
 	//check for the part of the selector behind the last divider : or :: and do the same as in the upper while loop
 	singleSpecialSelector=specialSelector.substring(a);
-	if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz") ){
+	if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz") && !under.str.startsWith(singleSpecialSelector,"::-webkit") && !under.str.startsWith(singleSpecialSelector,"::-moz") ){
 		var div=/\(([^\)]*)\)+/;
 		var insideBrackets="";
 		var match2=div.exec(singleSpecialSelector);
@@ -910,12 +910,13 @@ function checkSelectorStructure(word,obj,classes,distance,list){
 		while((match1=div1.exec(specialSelector))!==null){
 			//break combined pseudo classes and elements into parts
 			singleSpecialSelector=specialSelector.substring(a,match1.index);
-			if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz")){
+			if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz") && !under.str.startsWith(singleSpecialSelector,"::-webkit") && !under.str.startsWith(singleSpecialSelector,"::-moz")){
 				//check for brackets and remove content inside brackets for easier comparison
 				var div=/\(([^\)]*)\)+/;
 				var insideBrackets="";
 				match=div.exec(singleSpecialSelector);
 				if(match!=null){
+
 					insideBrackets=match[1];
 					singleSpecialSelector=singleSpecialSelector.substring(0,match.index+1)+singleSpecialSelector.substring(match.index+match[0].length-1);
 				}
@@ -957,7 +958,7 @@ function checkSelectorStructure(word,obj,classes,distance,list){
 		}
 		//check for the part of the selector behind the last divider : or :: and do the same as in the upper while loop
 		singleSpecialSelector=specialSelector.substring(a);
-		if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz") ){
+		if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz") && !under.str.startsWith(singleSpecialSelector,"::-webkit") && !under.str.startsWith(singleSpecialSelector,"::-moz") ){
 			var div=/\(([^\)]*)\)+/;
 			var insideBrackets="";
 			match=div.exec(singleSpecialSelector);
@@ -1234,6 +1235,7 @@ function findDuplicate(sheet){
 
 //function for finding and combining nested duplicated selectors. The procedure is the same as for unnested selectors.
 function duplicatesNested(selector,i,j,sheet,map,duplicates){
+	map.clear();
 	if(map.has(selector)){
 		duplicates.push(j);
 		logFile+=("Selector '"+selector+"' was duplicated.\n\n");

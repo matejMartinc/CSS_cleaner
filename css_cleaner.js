@@ -206,7 +206,7 @@ function simplifySelectors(sheet,window){
 	//check all not nested selectors
 	for(i in sheet.rules){
 	    var selectors=sheet.rules[i].selectors;
-	    if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+	    if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 			var selector;
 			if(selectors.length>1)
 				continue;//selector=selectors.join(",");
@@ -219,7 +219,7 @@ function simplifySelectors(sheet,window){
 		else if(sheet.rules[i].type=='media'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						continue;//selector=selectors.join(",");
@@ -234,7 +234,7 @@ function simplifySelectors(sheet,window){
 		else if(sheet.rules[i].type=='document'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						continue;//selector=selectors.join(",");
@@ -250,7 +250,7 @@ function simplifySelectors(sheet,window){
 		else if(sheet.rules[i].type=='supports'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						continue;//selector=selectors.join(",");
@@ -400,7 +400,7 @@ function orderCssDoc(sheet){
 			imports.push(sheet.rules[i]);
 		}
 		//find selectors
-		else if(sheet.rules[i].selectors!=undefined && sheet.rules[i].selectors[0].charAt(0)=='@')
+		else if(sheet.rules[i].selectors!=undefined && sheet.rules[i].selectors[0]!=undefined && sheet.rules[i].selectors[0].charAt(0)=='@')
 			et_rules.push(sheet.rules[i]);
 		else{
 			rule.push(sheet.rules[i]);
@@ -448,7 +448,7 @@ function delSelectors(sheet,window,deletion){
 	//check unnested and nested selectors and push them in an array if they are not used
 	for (i in sheet.rules){
 		var selectors=sheet.rules[i].selectors;
-	    if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+	    if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 			var selector;
 			if(selectors.length>1)
 				selector=selectors.join(",");
@@ -463,7 +463,7 @@ function delSelectors(sheet,window,deletion){
 		else if(sheet.rules[i].type=='media'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");
@@ -485,7 +485,7 @@ function delSelectors(sheet,window,deletion){
 		else if(sheet.rules[i].type=='document'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");
@@ -506,7 +506,7 @@ function delSelectors(sheet,window,deletion){
 		else if(sheet.rules[i].type=='supports'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");
@@ -726,7 +726,7 @@ function validateSelectors(sheet,classes,distance){
 	//find nested and unnested selectors and call 'validate' function
 	for(i in sheet.rules){
 	    var selectors=sheet.rules[i].selectors;
-	    if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+	    if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 			var selector;
 			if(selectors.length>1)
 				selector=selectors.join(",");
@@ -738,7 +738,7 @@ function validateSelectors(sheet,classes,distance){
 		else if(sheet.rules[i].type=='media'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined &&  selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");
@@ -751,7 +751,7 @@ function validateSelectors(sheet,classes,distance){
 		else if(sheet.rules[i].type=='document'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");
@@ -765,7 +765,7 @@ function validateSelectors(sheet,classes,distance){
 		else if(sheet.rules[i].type=='supports'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");
@@ -1134,7 +1134,7 @@ function findDuplicate(sheet){
 	//check for unnested duplicated selectors
 	for(i in sheet.rules){
 	    var selectors=sheet.rules[i].selectors;
-	    if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+	    if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 			var selector;
 			if(selectors.length>1)
 				selector=selectors.join(",");
@@ -1172,7 +1172,7 @@ function findDuplicate(sheet){
 		else if(sheet.rules[i].type=='media'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");
@@ -1191,7 +1191,7 @@ function findDuplicate(sheet){
 		else if(sheet.rules[i].type=='document'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");
@@ -1209,7 +1209,7 @@ function findDuplicate(sheet){
 		else if(sheet.rules[i].type=='supports'){
 			for(j in sheet.rules[i].rules){
 				var selectors=sheet.rules[i].rules[j].selectors;
-				if(selectors!=undefined && selectors[0].charAt(0)!='@'){
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
 					var selector;
 					if(selectors.length>1)
 						selector=selectors.join(",");

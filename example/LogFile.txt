@@ -49,7 +49,7 @@ Selector '#cloud6
 input[type="submit"]' was changed to '#cloud6 input[type="submit"]'.
 
 Selector 'go[foo|target=_blank] 
-[hruf=something] p[hruf=something]  >divi' was changed to 'mo[mo=_blank] [href=something] p[dir=something] >div'.
+[hruf=something] p[hruf=something]  >divi' was changed to 'mo[foo|target=_blank] [href=something] p[dir=something] >div'.
 
 Selector '[langi| =en]' was changed to '[lang=en]'.
 
@@ -69,7 +69,7 @@ Selector 'foo|a:before:before > go|a::ater zo|a::trget:target' was changed to 'f
 
 Selector '*|*' was changed to '*'.
 
-Selector '#head ~ h1 [href][href]    > a +   a [href][src][src]' was changed to '#head ~ h1 [href][href] > a + a [href][src][src]'.
+Selector '#head ~ h1 [href][href]    > a +   a[src]' was changed to '#head ~ h1 [href][href] > a + a[urn]'.
 
 
 
@@ -133,7 +133,7 @@ li
 
 #cloud6 input[type="submit"]
 
-mo[mo=_blank] [href=something] p[dir=something] >div
+mo[foo|target=_blank] [href=something] p[dir=something] >div
 
 [class|="flower"]
 
@@ -161,7 +161,7 @@ footer:before:before > meta::after meta:target:target
 
 #head #tree
 
-#head ~ h1 [href][href] > a + a [href][src][src]
+#head ~ h1 [href][href] > a + a[urn]
 
 
 

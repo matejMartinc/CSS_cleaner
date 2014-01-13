@@ -826,17 +826,17 @@ function validate(selector,classes, distance){
 		newSelector+=newWord+array[1]+array[2];
 		//convert selector to jquery compatible mode
 		jquerrySelector+=newWord+array[1]+array[3];
-					
-		
 		a=match.index+div.length;
 		//check selector attribute
 		if(div.length>1){
+			var attributeReturn="";
 			var attributeReturn=checkSelectorAtributes(newWord,div,el,classes, distance);
 			div=attributeReturn;
 		}
 		newSelector+=div;
 		jquerrySelector+=div;
 		formerdiv=div;
+
 	}
 	//check for the part of the selector behind the last divider and do the same as in the upper while loop
 	word=selector.substring(a);
@@ -1067,7 +1067,7 @@ function checkSelectorAtributes(word,attr,obj,classes,distance){
 		else{
 			var attributeSelector=attr;
 		}
-		var closestWord=word;
+		var closestWord=attributeSelector;
 		if(word!="" && distance>0){
 			var attributes;
 			//check if connected attribute is legit and if connected type selector has this attribute 

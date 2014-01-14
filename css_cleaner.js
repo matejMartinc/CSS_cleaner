@@ -282,6 +282,8 @@ function simple(selector,window){
 		selector=selector.substring(0,removeWhiteSpace[j])+selector.substring(removeWhiteSpace[j]+1);
 	}
 	removeWhiteSpace=[];
+	//check for brackets
+	var bracketList=findBrackets(selector);
 	//break selectors into simple selectors and save simple selectors in a list
 	var dividers=/(\[.*?\]|[, >+~])/g;
 	var word="";
@@ -291,8 +293,12 @@ function simple(selector,window){
 			
 	while((match=dividers.exec(selector))!==null){
 		var div=match[0];
+
+		if(checkForBrackets(match.index, bracketList))
+			continue;
 		
 		word=selector.substring(a,match.index);
+		
 		if(div.length<=1){
 			if(word.length>0){
 				list1.push(word+div);
@@ -313,10 +319,13 @@ function simple(selector,window){
 			}
 		}
 		a=match.index+match[0].length;
+
 	}
+
 	word=selector.substring(a);
 	if(word.length>0){
 		list1.push(word);
+		
 		jquerylist1.push(convertCssToJquery(word, jquerryList));
 	}	
 
@@ -332,8 +341,11 @@ function simple(selector,window){
 	var jqueryTransform=combinations(jquerylist1);
 	var realSelector=list[list.length-1].join("");
 	var bestSelector=jqueryTransform[jqueryTransform.length-1].join("");
+	
+	
 	try{
 		var one=window.$(bestSelector);
+
 	}
 	catch(err){
 		logFile+="Selector '"+realSelector+"' was not recognized as a valid selector by jquery.\n\n";
@@ -345,7 +357,14 @@ function simple(selector,window){
 		newSelector=jqueryTransform[j].join("");
 		if(newSelector.charAt(newSelector.length-1)==' ' || newSelector.charAt(newSelector.length-1)=='>' || newSelector.charAt(newSelector.length-1)=='~' || newSelector.charAt(newSelector.length-1)=='+' || newSelector.charAt(newSelector.length-1)==',')
 			newSelector=newSelector.substring(0,newSelector.length-1);
-		var two=window.$(newSelector);
+		try{
+			var two=window.$(newSelector);
+		}
+		catch(err){
+			logFile+="Selector '"+newSelector+"' was not recognized as a valid selector by jquery.\n\n";
+			return newSelector;
+		}
+		
 		var isEqual=true;
 		if(one.length!=two.length)
 			continue;
@@ -374,6 +393,7 @@ function simple(selector,window){
 	if(selector.length>realSelector.length)
 		logFile+="Replaced '"+selector+"' with '"+ realSelector+ "'.\n\n";
 	//return shortest combination
+	
 	return realSelector;
 }
 
@@ -557,25 +577,36 @@ function delUnusedSelectors(window,selector,deletion){
 function convertCssToJquery(selector,list){
 	var end="";
 	var dividers1=/[, >+~]/;
+	var bracketList=findBrackets(selector);
 	var matchdiv=dividers1.exec(selector);
 	if(matchdiv!==null){
-		end=matchdiv[0];
-		selector=selector.substring(0,matchdiv.index);
+		
+		if(!checkForBrackets(matchdiv.index, bracketList)){
+			selector=selector.substring(0,matchdiv.index);
+			end=matchdiv[0];
+		}	
 	}	
 	var divproperties=/\[/;
 	matchproperty=divproperties.exec(selector);
 	var property="";
 	var basic="";
 	var specialSelector="";
+	bracketList=findBrackets(selector);
 	if(matchproperty!=null){
-		property=selector.substring(matchproperty.index);
-		selector=selector.substring(0,matchproperty.index);
+		if(!checkForBrackets(matchproperty.index, bracketList)){
+			property=selector.substring(matchproperty.index);
+			selector=selector.substring(0,matchproperty.index);
+		}	
 	}
 	var divSelector=/(::|:)/;
 	matchSpecial=divSelector.exec(selector);
+	bracketList=findBrackets(selector);
 	if(matchSpecial!=null){
-		specialSelector=selector.substring(matchSpecial.index);
-		basic=selector.substring(0,matchSpecial.index);
+		if(!checkForBrackets(matchSpecial.index, bracketList)){
+			specialSelector=selector.substring(matchSpecial.index);
+			basic=selector.substring(0,matchSpecial.index);
+		}
+		
 	}
 	else
 		return selector+property+end;
@@ -585,8 +616,11 @@ function convertCssToJquery(selector,list){
 	var jquerySpecialSelector="";
 	var singleSpecialSelector="";
 	var isJqueryCompatible=true;
+	bracketList=findBrackets(specialSelector);
 	//check if there are more then one pseudo classes and elements in a 'specialSelector' string
 	while((match1=div1.exec(specialSelector))!==null){
+		if(checkForBrackets(match1.index, bracketList))
+			continue;
 		//break combined pseudo classes and elements into parts
 		singleSpecialSelector=specialSelector.substring(a,match1.index);
 		if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz") && !under.str.startsWith(singleSpecialSelector,"::-webkit") && !under.str.startsWith(singleSpecialSelector,"::-moz")){
@@ -780,6 +814,28 @@ function validateSelectors(sheet,classes,distance){
 	logFile+="\n\n";	
 }
 
+function findBrackets(selector){
+	var divBrackets=/\([^\)]*\)/g;
+	var insideBrackets="";
+	var bracketContent=[];
+	while((matchBrackets=divBrackets.exec(selector))!=null){
+		insideBrackets=matchBrackets[0];
+		bracketContent.push([matchBrackets.index, matchBrackets.index+matchBrackets[0].length -1]);
+	}
+	return bracketContent;
+}
+
+function checkForBrackets(index,list){
+	insidebrackets=false;
+	for (var k = 0; k < list.length; k++) {
+		if(index>list[k][0] && index<list[k][1])
+			return true;
+	};
+	return false;
+	
+}
+
+
 //validate selectors
 function validate(selector,classes, distance){
 	var array;
@@ -809,7 +865,12 @@ function validate(selector,classes, distance){
 	var a=0;
 	var formerdiv="";
 	var newWord="";
+	var bracketList=findBrackets(selector);
+	
 	while((match=dividers.exec(selector))!==null){
+		if(checkForBrackets(match.index, bracketList)){
+			continue;
+		}	
 		var div=match[0];
 		
 		word=selector.substring(a,match.index);
@@ -871,17 +932,22 @@ function checkSelectorStructure(word,obj,classes,distance,list){
 	var specialSelector="";
 	var basicSelector=word;
 	var classOrId="";
+	var bracketList=findBrackets(basicSelector);
 	//check for pseudo classes and elements
 	var div=/(::|:)/;
 	match=div.exec(basicSelector);
 	if(match!=null){
-		specialSelector=basicSelector.substring(match.index);
-		basicSelector=basicSelector.substring(0,match.index);
+		if(!checkForBrackets(match.index, bracketList)){
+			specialSelector=basicSelector.substring(match.index);
+			basicSelector=basicSelector.substring(0,match.index);
+		}	
 	}
+	
 	//check if selector is a class or identifier
 	var div=/(\.|#)/;
 	match=div.exec(basicSelector);
 	if(match!=null){
+		
 		classOrId=basicSelector.substring(match.index);
 		//check if selector is a combination of more then one class, break selector into single classes and save classes in set 'classes' which is used in getclasses function
 		var multiple=classOrId.split(".");
@@ -897,17 +963,22 @@ function checkSelectorStructure(word,obj,classes,distance,list){
 		else if(match[0]==".")
 			classes.add(multiple[0]);
 		basicSelector=basicSelector.substring(0,match.index);
+		
 	}
 	var newSpecialSelector="";
 	var jquerySpecialSelector="";
+	
 	//check if pseudo classes and elements are legit
 	if(specialSelector!=""){
 		var div1=/:+/g;
 		var a=0;
 		var singleSpecialSelector="";
 		var isJqueryCompatible=true;
+		bracketList=findBrackets(specialSelector);
 		//check if there are more then one pseudo classes and elements in a 'special selector' string
 		while((match1=div1.exec(specialSelector))!==null){
+			if(checkForBrackets(match1.index, bracketList))
+				continue;
 			//break combined pseudo classes and elements into parts
 			singleSpecialSelector=specialSelector.substring(a,match1.index);
 			if(singleSpecialSelector.length>0 && !under.str.startsWith(singleSpecialSelector,":-webkit") && !under.str.startsWith(singleSpecialSelector,":-moz") && !under.str.startsWith(singleSpecialSelector,"::-webkit") && !under.str.startsWith(singleSpecialSelector,"::-moz")){
@@ -1308,7 +1379,7 @@ function DamerauLevenshteinDistance(s, t) {
 
 //an object with all html tags and their attributes
 var el={}
-    el["html"]=["manifest"];
+    el["html"]=["manifest","xmlns"];
     el["head"]=["profile"];
     el["title"]=[];
     el["base"]=['href','target'];

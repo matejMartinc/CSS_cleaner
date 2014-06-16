@@ -79,7 +79,7 @@ exports.main=function(url, distance, deletion, simplification, compression){
 					if(globalCssDoc.length>0){
 						async.each(globalCssDoc, f,function(err){
 		    				if(!equal){
-		    					logFileV="";
+		    					
 		    					console.log('prevalidation of ' + url);
 			    				bodies=prevalidation(bodies);
 			    				try{
@@ -1026,7 +1026,7 @@ function findCss(window,url){
 		    cssDoc.push(css);
 		}				
 	});
-	logFileV+="Program found next css files on the page: \n\n";
+	logFileV+="Program found next css files on the page: "+url+" \n\n";
 	//convert relative paths to absolute paths
 	for (var i = 0; i < cssDoc.length; i++) {
 		var css=cssDoc[i]+"\n";
@@ -1626,7 +1626,7 @@ function findDuplicate(sheet){
 	for(var i=duplicates.length-1;i>=0;i--){
 		(sheet.rules).splice(duplicates[i],1);
 	}
-	logFileV="\n\n";
+	logFileV+="\n\n";
 }
 
 //function for finding and combining nested duplicated selectors. The procedure is the same as for unnested selectors.

@@ -10,131 +10,151 @@ var request = require('request');
 var async=require('async');
 var jsdom = require("jsdom");
 var css=require("css");
-
+var phantom=require('node-phantom-simple');
 var jquery = fs.readFileSync("./jquery.js", "utf-8");
-if(!process.argv[2]){
-	console.log("You need to specify html file.");
-	process.exit(code=0);
-}
-var url=process.argv[2];
-var distance;
-var deletion;
-var simplification;
-var compression;
 
-if(process.argv[3]){
-	distance=parseInt(process.argv[3])+1;
-}	
-else	
-	distance=6;
-
-if(!process.argv[4])
-	deletion='deletionOn';
-else
-	deletion=process.argv[4];
-if(!process.argv[5])
-    simplification='simplificationOn';
-else
-	simplification=process.argv[5];
-
-if(!process.argv[6])
-	compression='compressionOff';
-else
-	compression=process.argv[6];
 
 
 var jquerryConversion={};
 var classes=new Set();
-var logFile="";
+var logFileD="";
+var logFileV="";
+var logFileS="";
+var logFileE="";
+var logFileC="CLASSES ON PAGE THAT ARE NOT DECLARED IN CSS:_________________________________________\n\n\n";
+var globalCssDoc=[];
+var sheet;
+var obj;
+var unusedSelectorsf={};
+var simplifiedSelectorsf={};
 
 
-main(url);
+exports.main=function(url, distance, deletion, simplification, compression){
+	var distance = typeof distance !== 'undefined' ? distance : 2;
+   	var deletion = typeof deletion !== 'undefined' ? deletion : true;
+   	var simplification = typeof simplification !== 'undefined' ? simplification : true;
+   	var compression = typeof simplification !== 'undefined' ? simplification : true;
 
-function main(url){
-	jsdom.env({
-  		url: url,
-  		src: [jquery],
-    	done: function (errors, window) {
-    		if(!errors){
-	    		
-	    		try{
-	    		    
-	    		    var cssDoc=findCss(window, url);
-	    		    
-	    		    if(cssDoc.length==0){
-	    		    	console.log("No css files were found.");
-	    		    	process.exit(code=0);
-	    		    }	
+	var connectToSite = function connect(url, callback1){
+		var equal=true;
+		jsdom.env({
+	  		url: url,
+	  		src: [jquery],
+	    	done: function (errors, window) {
+	    		if(!errors){
+		    		try{
+		    		    
+		    		    var cssDoc=findCss(window, url);
+		    		    for (var i = 0; i < cssDoc.length; i++) {
+		    		    	if(!contains(globalCssDoc, cssDoc[i])){
+		    		    		equal=false;
+		    		    		globalCssDoc.push(cssDoc[i]);
+		    		    	}
 
-	    		}
-	    		catch(err){
-	    			console.log("Program appears to have crashed :(.");
-	    		}    
-	    		
-	    		var bodies="";
-	    		//this function concatenates content of all the css files found
-	    		var f= function httpReq(url,callback){
-					request(url,function (error, response, body) {
-						if (!error && response.statusCode == 200) {
-							bodies+=body;
-							callback();
+		    		    }
+		    		}
+		    		catch(err){
+		    			console.log("Program appears to have crashed :(.");
+		    		} 
+		    		  
+		    		
+		    		var bodies="";
+		    		//this function concatenates content of all the css files found
+		    		var f= function httpReq(url,callback){
+						if(!equal){
+							request(url, function (error, response, body){
+								if (!error && response.statusCode == 200) {
+									bodies+=body;
+									callback();
+								}
+								else{
+									callback();
+								}	
+							});
 						}
 						else{
 							callback();
-						}	
-					});
-				}
-				async.each(cssDoc, f,function(err){
-    				console.log('prevalidation');
-    				bodies=prevalidation(bodies);
-    				var obj=css.parse(bodies);
-    				    
-    				var sheet=obj.stylesheet;
-					orderCssDoc(sheet);
-					console.log('validation');
-					logFile+="VALIDATION:___________________________________________________________________________\n\n\n";
-    				validateSelectors(sheet,classes,distance);
-					console.log('finding duplicates');
-					logFile+="FINDING AND COMBINING/DELETING DUPLICATED DECLARATIONS:_______________________________\n\n\n";
-    				findDuplicate(sheet);
-
-    				if(deletion!='deletionOff'){
-    					logFile+="DELETION OF UNUSED SELECTORS:_____________________________________________________\n\n\n";
-    					deletion=true;
-    				}
-    				else
-    					deletion=false;
-    				if(deletion)
-    					console.log("deletion of unused selectors");
-    				delSelectors(sheet,window,deletion);
-    				
-    				
-    				if(simplification!='simplificationOff'){
-    					console.log('simplification');
-				    	logFile+="SIMPLIFICATION OF SELECTORS:______________________________________________________\n\n\n";
-				    	simplifySelectors(sheet, window);
-				    }	
-				    logFile+="CLASSES ON PAGE THAT ARE NOT DECLARED IN CSS:_________________________________________\n\n\n";
-				    
-				    var file=css.stringify(obj);
-					fs.writeFileSync("optimizedCSS.css", css.stringify(obj));
-					
-				    getClasses(window,classes);
-				    
-				    if(compression!='compressionOff'){
-					    new compressor.minify({
-	    					type: 'yui-css',
-	    					fileIn: "optimizedCSS.css",
-	    					fileOut: "optimizedCSS.css",
-	   					});
+						}
 					}
-					
-					fs.writeFileSync("LogFile.txt", logFile);
-					
-				});
-	    	}
+					if(globalCssDoc.length>0){
+						async.each(globalCssDoc, f,function(err){
+		    				if(!equal){
+		    					logFileV="";
+		    					console.log('prevalidation of ' + url);
+			    				bodies=prevalidation(bodies);
+			    				try{
+			    					obj=css.parse(bodies);
+			    				}
+			    				catch(err){
+			    					console.log("Syntax error in CSS file:\n" + err);
+			    				}
+		    				    sheet=obj.stylesheet;
+								orderCssDoc(sheet);
+								console.log('validation of ' + url);
+								logFileV+="VALIDATION:___________________________________________________________________________\n\n\n";
+		    					validateSelectors(sheet,classes,distance);
+								console.log('finding duplicates on ' + url);
+								logFileV+="FINDING AND COMBINING/DELETING DUPLICATED DECLARATIONS:_______________________________\n\n\n";
+		    					findDuplicate(sheet);
+		    				}
+		    				if(deletion)
+		    					console.log("finding candidates for unused selectors on " + url);
+							delSelectors(sheet,window,deletion);
+		    				
+		    				
+		    				if(simplification){
+		    					console.log("finding candidate selectors for simplification on " + url);
+		    					simplifySelectors(sheet, window);
+						    }	
+						    
+						    
+						    
+							
+						    getClasses(window,classes, url);
+						    
+						    
+							
+							
+							callback1();
+						});
+					}
+		    	}
+		    	else{
+		    		console.log("Site " + url + " not available.")
+		    		callback1();
+		    	}
+			}
+		});
+			
+	}
+	async.eachSeries(url, connectToSite, function(err){
+		if(globalCssDoc.length>0){
+			if(deletion){
+		    	logFileD+="DELETION OF UNUSED SELECTORS:_____________________________________________________\n\n\n";
+		    	console.log("deletion of unused selectors");
+				delSelectorsFinal(sheet);
+			} 
+
+			if(simplification){
+		    	console.log('simplification');
+				logFileS+="SIMPLIFICATION OF SELECTORS:______________________________________________________\n\n\n";
+				simplifySelectorsFinal(sheet);
+			}
+
+			var file=css.stringify(obj);
+			fs.writeFileSync("optimizedCSS.css", css.stringify(obj));
+							
+		    if(compression){
+			    new compressor.minify({
+					type: 'yui-css',
+					fileIn: "optimizedCSS.css",
+					fileOut: "optimizedCSS.css",
+					});
+			}
+
+			fs.writeFileSync("LogFile.txt", logFileV+logFileD+logFileS+logFileE+logFileC);
 		}
-	});	
+	});
 }
 
 
@@ -164,7 +184,7 @@ function prevalidation(body){
 }
 
 //find all classes not defined in css
-function getClasses(window,classes){
+function getClasses(window,classes,url){
 	var set=new Set();
 	//find classes declared in html file
 	window.$("[class]").each( function( index, element ){
@@ -177,8 +197,9 @@ function getClasses(window,classes){
 	    	}
   		}
 	});
+	logFileC+="Undefined classes on page "+url+":\n\n";
 	//write undefined classes in logFile
-	set.each(function(e){logFile+=(e+"\n\n");});
+	set.each(function(e){logFileC+=(e+"\n\n");});
 	
 }
 
@@ -212,7 +233,7 @@ function simplifySelectors(sheet,window){
 				continue;//selector=selectors.join(",");
 			else
 				selector=selectors[0];
-			sheet.rules[i].selectors=simple(selector, window).split(",");
+			simple(selector, window);
 			
 		}
 		//check nested selectors in @media rule
@@ -225,7 +246,7 @@ function simplifySelectors(sheet,window){
 						continue;//selector=selectors.join(",");
 					else
 						selector=selectors[0];
-					sheet.rules[i].rules[j].selectors=simple(selector, window).split(",");
+					simple(selector, window);
 				}
 			}
 			
@@ -240,7 +261,7 @@ function simplifySelectors(sheet,window){
 						continue;//selector=selectors.join(",");
 					else
 						selector=selectors[0];
-					sheet.rules[i].rules[j].selectors=simple(selector, window).split(",");
+					simple(selector, window);
 					
 				}
 			}
@@ -256,22 +277,140 @@ function simplifySelectors(sheet,window){
 						continue;//selector=selectors.join(",");
 					else
 						selector=selectors[0];
-					sheet.rules[i].rules[j].selectors=simple(selector, window).split(",");
+					simple(selector, window);
 				}
 			}
 			
 		}
 		
 	}
-	logFile+="\n\n";
+	
+}
+
+function simplifySelectorsFinal(sheet){
+	//check all not nested selectors
+	for(i in sheet.rules){
+	    var selectors=sheet.rules[i].selectors;
+	    if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
+			var selector;
+			if(selectors.length>1)
+				continue;//selector=selectors.join(",");
+			else
+				selector=selectors[0];
+			if(simplifiedSelectorsf[selector][1].length==0)
+				continue;
+			else{
+				var simpleSelectors=simplifiedSelectorsf[selector][1];
+				var best = simpleSelectors[0];
+				if(simpleSelectors.length>1){
+					for (var j = 1; j < simpleSelectors.length; j++) {
+						if(simpleSelectors[j].length<best.length)
+							best=simpleSelectors[j];		
+					};
+				}
+				sheet.rules[i].selectors[0]=best;
+				logFileS+="Selector "+selector+" was changed to "+best+".\n";
+			}
+			
+		}
+		//check nested selectors in @media rule
+		else if(sheet.rules[i].type=='media'){
+			for(j in sheet.rules[i].rules){
+				var selectors=sheet.rules[i].rules[j].selectors;
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
+					var selector;
+
+					if(selectors.length>1)
+						continue;//selector=selectors.join(",");
+					else
+						selector=selectors[0];
+					if(simplifiedSelectorsf[selector][1].length==0)
+						continue;
+					else{
+						var simpleSelectors=simplifiedSelectorsf[selector][1];
+						var best = simpleSelectors[0];
+						if(simpleSelectors.length>1){
+							for (var k = 1; k < simpleSelectors.length; k++) {
+								if(simpleSelectors[k].length<best.length)
+									best=simpleSelectors[k];		
+							};
+						}
+						sheet.rules[i].rules[j].selectors[0]=best;
+						logFileS+="Selector "+selector+" was changed to "+best+".\n";
+					}
+				}
+			}
+		}
+		//check nested selectors in @document rule
+		else if(sheet.rules[i].type=='document'){
+			for(j in sheet.rules[i].rules){
+				var selectors=sheet.rules[i].rules[j].selectors;
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
+					var selector;
+					if(selectors.length>1)
+						continue;//selector=selectors.join(",");
+					else
+						selector=selectors[0];
+					if(simplifiedSelectorsf[selector][1].length==0)
+						continue;
+					else{
+						var simpleSelectors=simplifiedSelectorsf[selector][1];
+						var best = simpleSelectors[0];
+						if(simpleSelectors.length>1){
+							for (var k = 1; k < simpleSelectors.length; k++) {
+								if(simpleSelectors[k].length<best.length)
+									best=simpleSelectors[k];		
+							};
+						}
+						sheet.rules[i].rules[j].selectors[0]=best;
+						logFileS+="Selector "+selector+" was changed to "+best+".\n";
+					}
+					
+				}
+			}
+			
+		}
+		//check nested selectors in @document rule
+		else if(sheet.rules[i].type=='supports'){
+			for(j in sheet.rules[i].rules){
+				var selectors=sheet.rules[i].rules[j].selectors;
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
+					var selector;
+					if(selectors.length>1)
+						continue;//selector=selectors.join(",");
+					else
+						selector=selectors[0];
+					if(simplifiedSelectorsf[selector][1].length==0)
+						continue;
+					else{
+						var simpleSelectors=simplifiedSelectorsf[selector][1];
+						var best = simpleSelectors[0];
+						if(simpleSelectors.length>1){
+							for (var k = 1; k < simpleSelectors.length; k++) {
+								if(simpleSelectors[k].length<best.length)
+									best=simpleSelectors[k];		
+							};
+						}
+						sheet.rules[i].rules[j].selectors[0]=best;
+						logFileS+="Selector "+selector+" was changed to "+best+".\n";
+					}
+				}
+			}
+			
+		}
+		
+	}
+	logFileS+="\n\n";
 }
 
 
 //simplify overspecified selectors
 function simple(selector,window){
 	//remove unnecessary white space - required for upcoming operations on selector
+	var originalSelector=selector;
+	var children=false;
 	var list1=[];
-	var jquerylist1=[]
+	var jquerylist1=[];
 	var removeWhiteSpace=[];
 	selector=selector.trim();
 	for (var j = 0; j < selector.length; j++) {
@@ -282,6 +421,75 @@ function simple(selector,window){
 		selector=selector.substring(0,removeWhiteSpace[j])+selector.substring(removeWhiteSpace[j]+1);
 	}
 	removeWhiteSpace=[];
+
+	if(simplifiedSelectorsf.hasOwnProperty(originalSelector)){
+		
+		if(simplifiedSelectorsf[originalSelector][0].length==0)
+			return;
+		else{
+			
+			try{
+				//determine if use of DOM method querySelectorAll is posssible
+				if(originalSelector.indexOf(">")==-1)
+					var one=window.document.querySelectorAll(jquerryConversion[originalSelector]);
+				else{
+					var one=window.$(jquerryConversion[originalSelector]);
+					children=true;
+				}
+				
+				
+			}		
+			catch(err){
+				console.log(err);
+				logFileE+="Selector '"+selector+"' was not recognized as a valid selector by jquery.\n\n";
+				return;
+			}
+			var deleted=[];
+			
+			for (var i = 0; i < simplifiedSelectorsf[originalSelector][0].length; i++) {
+				try{
+					//determine if use of DOM method querySelectorAll is posssible
+					if(!children)
+						var two=window.document.querySelectorAll(simplifiedSelectorsf[originalSelector][0][i]);
+					else{
+						var two=window.$(simplifiedSelectorsf[originalSelector][0][i]);
+					}
+					
+				}		
+				catch(err){
+					logFileE+="Selector '"+selector+"' was not recognized as a valid selector by jquery.\n\n";
+					return;
+				}
+				var isEqual=true;
+				if(one.length!=two.length)
+					deleted.push(i);
+				if(!children){
+					for(var k=0;k<one.length;k++){
+						if(one[k]!=two[k]){
+							deleted.push(i);
+							break;
+						}
+					}
+				}
+				else{
+					for(var k=0;k<one.length;k++){
+						if(one.get(k)!=two.get(k)){
+							deleted.push(i);
+							break;
+						}
+					}
+				}
+			}
+			for (var i = deleted.length - 1; i >= 0; i--) {
+				simplifiedSelectorsf[originalSelector][0].splice(deleted[i],1);
+				simplifiedSelectorsf[originalSelector][1].splice(deleted[i],1);
+			};
+			
+		}
+		return;
+	}
+	simplifiedSelectorsf[originalSelector]=[[],[]];
+
 	//check for brackets
 	var bracketList=findBrackets(selector);
 	//break selectors into simple selectors and save simple selectors in a list
@@ -304,21 +512,10 @@ function simple(selector,window){
 				list1.push(word+div);
 				jquerylist1.push(convertCssToJquery(word+div, jquerryList));
 			}
-			if(formerSelector.length>0){
-				list1.push(formerSelector+div);
-				jquerylist1.push(convertCssToJquery(formerSelector+div, jquerryList));
-				formerSelector="";
-			}
+			a=match.index+match[0].length;
 		}
-		if(div.length>1){
-			if(word.length>0){
-				formerSelector=word+div;
-			}
-			else{
-				formerSelector=formerSelector+div;
-			}
-		}
-		a=match.index+match[0].length;
+		
+		
 
 	}
 
@@ -327,16 +524,13 @@ function simple(selector,window){
 		list1.push(word);
 		
 		jquerylist1.push(convertCssToJquery(word, jquerryList));
-	}	
-
-	if(formerSelector.length>0){
-		list1.push(formerSelector);
-		jquerylist1.push(convertCssToJquery(formerSelector, jquerryList));
-	}	
+	}
+	
 	var newSelector="";
 	//create a list of all combinations of simple selectors in selectors
-	if(list1.length<2)
-		return selector;
+	if(list1.length<2){
+		return;
+	}
 	var list=combinations(list1);
 	var jqueryTransform=combinations(jquerylist1);
 	var realSelector=list[list.length-1].join("");
@@ -344,12 +538,17 @@ function simple(selector,window){
 	
 	
 	try{
-		var one=window.$(bestSelector);
-
+		//determine if use of DOM method querySelectorAll is posssible
+		if(bestSelector.indexOf(">")==-1)
+			var one=window.document.querySelectorAll(bestSelector);
+		else{
+			var one=window.$(bestSelector);
+			children=true;
+		}
 	}
 	catch(err){
-		logFile+="Selector '"+realSelector+"' was not recognized as a valid selector by jquery.\n\n";
-		return realSelector;
+		logFileE+="Selector '"+realSelector+"' was not recognized as a valid selector by jquery.\n\n";
+		return;
 	}	
 	
 	//check if combination of simple selectors returns the same result as original selector
@@ -358,43 +557,50 @@ function simple(selector,window){
 		if(newSelector.charAt(newSelector.length-1)==' ' || newSelector.charAt(newSelector.length-1)=='>' || newSelector.charAt(newSelector.length-1)=='~' || newSelector.charAt(newSelector.length-1)=='+' || newSelector.charAt(newSelector.length-1)==',')
 			newSelector=newSelector.substring(0,newSelector.length-1);
 		try{
-			var two=window.$(newSelector);
+			if(!children)
+				var two=window.document.querySelectorAll(newSelector);
+			else{
+				var two=window.$(newSelector);
+			}
 		}
 		catch(err){
-			logFile+="Selector '"+newSelector+"' was not recognized as a valid selector by jquery.\n\n";
+			logFileE+="Selector '"+newSelector+"' was not recognized as a valid selector by jquery.\n\n";
 			return newSelector;
 		}
 		
 		var isEqual=true;
 		if(one.length!=two.length)
 			continue;
-		for(var k=0;k<one.length;k++){
-			if(one.get(k)!=two.get(k)){
-				isEqual=false;
-				break;
+		if(!children){
+			for(var k=0;k<one.length;k++){
+				if(one[k]!=two[k]){
+					isEqual=false;
+					break;
+				}
 			}
 		}
-		//if result is the same and combination is shorter then original selector, switch original selector with combination
+		else{
+			for(var k=0;k<one.length;k++){
+				if(one.get(k)!=two.get(k)){
+					isEqual=false;
+					break;
+				}
+			}
+		}
+		//if result is the same and combination is shorter then original selector, save combination in a list
 		if(isEqual){
-			if(newSelector.length<bestSelector.length){
-				bestSelector=newSelector;
-				one=two;
-				realSelector=list[j].join("");
-				
-				if(realSelector.charAt(realSelector.length-1)==' ' || realSelector.charAt(realSelector.length-1)=='>' || realSelector.charAt(realSelector.length-1)=='~' || realSelector.charAt(realSelector.length-1)=='+' || realSelector.charAt(realSelector.length-1)==',')
-					realSelector=realSelector.substring(0,realSelector.length-1);
-				
-				
-			}	
+			
+			simplifiedSelectorsf[originalSelector][0].push(newSelector);	
+			var simplifiedSelector=list[j].join("");
+			if(simplifiedSelector.charAt(simplifiedSelector.length-1)==' ' || simplifiedSelector.charAt(simplifiedSelector.length-1)=='>' || simplifiedSelector.charAt(simplifiedSelector.length-1)=='~' || simplifiedSelector.charAt(simplifiedSelector.length-1)=='+' || simplifiedSelector.charAt(simplifiedSelector.length-1)==',')
+				simplifiedSelector=simplifiedSelector.substring(0,simplifiedSelector.length-1);
+			simplifiedSelectorsf[originalSelector][1].push(simplifiedSelector);	
 		}
 	}
-	list1=[];
-	jquerylist1=[];
-	if(selector.length>realSelector.length)
-		logFile+="Replaced '"+selector+"' with '"+ realSelector+ "'.\n\n";
-	//return shortest combination
-	
-	return realSelector;
+	var list1=[];
+	var jquerylist1=[];
+	children=false;
+	return;
 }
 
 
@@ -458,13 +664,7 @@ function orderCssDoc(sheet){
 
 }
 
-
-//delete unused selectors in css file
 function delSelectors(sheet,window,deletion){
-	var unusedSelectors=[];
-	var unusedSelectorsm=[];
-	var unusedSelectorsd=[];
-	var unusedSelectorss=[];
 	//check unnested and nested selectors and push them in an array if they are not used
 	for (i in sheet.rules){
 		var selectors=sheet.rules[i].selectors;
@@ -474,10 +674,19 @@ function delSelectors(sheet,window,deletion){
 				selector=selectors.join(",");
 			else
 				selector=selectors[0];
-			if(delUnusedSelectors(window,selector,deletion)<0){
-				
-				unusedSelectors.push(i);
-				logFile+=(selector+"\n\n");
+			if(unusedSelectorsf.hasOwnProperty(selector)){
+				if(unusedSelectorsf[selector]){
+					if(delUnusedSelectors(window,selector,deletion)>=0){
+						unusedSelectorsf[selector]=false;
+					}
+				}
+			}
+			else{
+				if(delUnusedSelectors(window,selector,deletion)<0){
+					unusedSelectorsf[selector]=true;
+				}
+				else
+					unusedSelectorsf[selector]=false;
 			}
 		}
 		else if(sheet.rules[i].type=='media'){
@@ -489,9 +698,113 @@ function delSelectors(sheet,window,deletion){
 						selector=selectors.join(",");
 					else
 						selector=selectors[0];
-					if(delUnusedSelectors(window,selector,deletion)<0){
+					if(unusedSelectorsf.hasOwnProperty(selector)){
+						if(unusedSelectorsf[selector]){
+							if(delUnusedSelectors(window,selector,deletion)>=0){
+								unusedSelectorsf[selector]=false;
+							}
+						}
+					}
+					else{
+						if(delUnusedSelectors(window,selector,deletion)<0){
+							unusedSelectorsf[selector]=true;
+						}
+						else
+							unusedSelectorsf[selector]=false;
+					}
+				}
+			}
+		}
+		else if(sheet.rules[i].type=='document'){
+			for(j in sheet.rules[i].rules){
+				var selectors=sheet.rules[i].rules[j].selectors;
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
+					var selector;
+					if(selectors.length>1)
+						selector=selectors.join(",");
+					else
+						selector=selectors[0];
+					if(unusedSelectorsf.hasOwnProperty(selector)){
+						if(unusedSelectorsf[selector]){
+							if(delUnusedSelectors(window,selector,deletion)>=0){
+								unusedSelectorsf[selector]=false;
+							}
+						}
+					}
+					else{
+						if(delUnusedSelectors(window,selector,deletion)<0){
+							unusedSelectorsf[selector]=true;
+						}
+						else
+							unusedSelectorsf[selector]=false;
+					}
+				}
+			}
+		}
+		else if(sheet.rules[i].type=='supports'){
+			for(j in sheet.rules[i].rules){
+				var selectors=sheet.rules[i].rules[j].selectors;
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
+					var selector;
+					if(selectors.length>1)
+						selector=selectors.join(",");
+					else
+						selector=selectors[0];
+					if(unusedSelectorsf.hasOwnProperty(selector)){
+						if(unusedSelectorsf[selector]){
+							if(delUnusedSelectors(window,selector,deletion)>=0){
+								unusedSelectorsf[selector]=false;
+							}
+						}
+					}
+					else{
+						if(delUnusedSelectors(window,selector,deletion)<0){
+							unusedSelectorsf[selector]=true;
+						}
+						else
+							unusedSelectorsf[selector]=false;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+//delete unused selectors in css file
+function delSelectorsFinal(sheet){
+	var unusedSelectors=[];
+	var unusedSelectorsm=[];
+	var unusedSelectorsd=[];
+	var unusedSelectorss=[];
+	//check unnested and nested selectors and push them in an array if they are not used
+	for (i in sheet.rules){
+		var selectors=sheet.rules[i].selectors;
+		if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
+			var selector;
+			if(selectors.length>1)
+				selector=selectors.join(",");
+			else
+				selector=selectors[0];
+			
+			if(unusedSelectorsf[selector]){
+				unusedSelectors.push(i);
+				
+				logFileD+=(selector+"\n\n");
+			}
+		}
+		else if(sheet.rules[i].type=='media'){
+			for(j in sheet.rules[i].rules){
+				var selectors=sheet.rules[i].rules[j].selectors;
+				if(selectors!=undefined && selectors[0]!=undefined && selectors[0].charAt(0)!='@'){
+					var selector;
+					if(selectors.length>1)
+						selector=selectors.join(",");
+					else
+						selector=selectors[0];
+					if(unusedSelectorsf[selector]){
 						unusedSelectorsm.push(j);
-						logFile+=(selector+"\n\n");
+						logFileD+=(selector+"\n\n");
 						
 					}
 				}
@@ -511,9 +824,9 @@ function delSelectors(sheet,window,deletion){
 						selector=selectors.join(",");
 					else
 						selector=selectors[0];
-					if(delUnusedSelectors(window,selector,deletion)<0){
+					if(unusedSelectorsf[selector]){
 						unusedSelectorsd.push(j);
-						logFile+=(selector+"\n\n");
+						logFileD+=(selector+"\n\n");
 					}
 				}
 			}
@@ -532,9 +845,9 @@ function delSelectors(sheet,window,deletion){
 						selector=selectors.join(",");
 					else
 						selector=selectors[0];
-					if(delUnusedSelectors(window,selector,deletion)<0){
+					if(unusedSelectorsf[selector]){
 						unusedSelectorss.push(j);
-						logFile+=(selector+"\n\n");
+						logFileD+=(selector+"\n\n");
 					}
 				}
 			}
@@ -551,17 +864,29 @@ function delSelectors(sheet,window,deletion){
 	for(var i=unusedSelectors.length-1; i>=0; i--){
 		(sheet.rules).splice(unusedSelectors[i],1);
 	}
-	logFile+="\n\n";
+	logFileD+="\n\n";
 
 }
 
 //checks if selectors in css file are used
 function delUnusedSelectors(window,selector,deletion){
+	
+	var children=false;
+	//determine if use of DOM method querySelectroAll is posssible
+	if(selector.indexOf(">")==-1)
+		children=true;
 	try{
 		var jqSelector=jquerryConversion[selector];
 		//check if selector is not used and return -1 in that case
-		if(deletion && window.$(jqSelector).length==0){
-			return -1;
+		if(!children){
+			if(deletion && window.document.querySelectorAll(jqSelector).length==0){
+				return -1;
+			}
+		}
+		else{
+			if(deletion && window.$(jqSelector).length==0){
+				return -1;
+			}
 		}
 	}
 	//check if selector is corrupt and return -2 in that case
@@ -701,17 +1026,17 @@ function findCss(window,url){
 		    cssDoc.push(css);
 		}				
 	});
-	logFile+="Program found next css files on the page: \n\n";
+	logFileV+="Program found next css files on the page: \n\n";
 	//convert relative paths to absolute paths
 	for (var i = 0; i < cssDoc.length; i++) {
 		var css=cssDoc[i]+"\n";
 		if(css!=undefined){
 		    if(css.indexOf(url)==0 || css.substring(0,4) == "http"){
-		    	logFile+=cssDoc[i]+"\n";
+		    	logFileV+=cssDoc[i]+"\n";
 		    }
 		    else if(css.charAt(0)=='/'){
 		        cssDoc[i]=window.location.protocol+"//"+window.location.host+cssDoc[i];
-		        logFile+=cssDoc[i]+"\n";
+		        logFileV+=cssDoc[i]+"\n";
 		    }
 			else if(css.charAt(0)=='.' && css.charAt(1)=='.'){
 				var path=window.location.href;
@@ -724,7 +1049,7 @@ function findCss(window,url){
 					}
 				}
 				cssDoc[i]=path+cssDoc[i].substring(2);
-				logFile+=cssDoc[i]+"\n";
+				logFileV+=cssDoc[i]+"\n";
 			}
 			else if(css.charAt(0)=='.' && css.charAt(1)=='/'){
 				var path=window.location.href;
@@ -735,7 +1060,7 @@ function findCss(window,url){
 					}
 				}
 				cssDoc[i]=path+cssDoc[i].substring(1);
-				logFile+=cssDoc[i]+"\n";			
+				logFileV+=cssDoc[i]+"\n";			
 			}
 			else if(css.substring(0,4) != "http"){
 				var path=window.location.href;
@@ -746,12 +1071,12 @@ function findCss(window,url){
 					}
 				}
 				cssDoc[i]=path+"/"+cssDoc[i];
-				logFile+=cssDoc[i]+"\n";				
+				logFileV+=cssDoc[i]+"\n";				
 			}
 		}
 
 	};
-	logFile+=("\n\n");
+	logFileV+=("\n\n");
 	return cssDoc;
 }
 
@@ -811,7 +1136,7 @@ function validateSelectors(sheet,classes,distance){
 			
 		}
 	}
-	logFile+="\n\n";	
+	logFileV+="\n\n";	
 }
 
 function findBrackets(selector){
@@ -917,7 +1242,7 @@ function validate(selector,classes, distance){
 	//set jqueryConversion is later used in delUnusedSelector function.
 	jquerryConversion[newSelector]=jquerrySelector;
 	if(newSelector!=logSelector){
-		logFile+=("Selector '"+logSelector+"' was changed to '"+newSelector+"'.\n\n");
+		logFileV+=("Selector '"+logSelector+"' was changed to '"+newSelector+"'.\n\n");
 	}
 	return newSelector;
 }
@@ -1118,7 +1443,7 @@ function checkSelectorAtributes(word,attr,obj,classes,distance){
 			else
 				closestWord=word;
 		}
-		//find classes and put them in a classes set whick is used in get classes method
+		//find classes and put them in a classes set which is used in get classes method
 		if(closestWord=="class"){
 			var c=div.substring(div.indexOf("=")+1);
 			if(c[0]=="'" || c[0]=='"')
@@ -1215,7 +1540,7 @@ function findDuplicate(sheet){
 			//if selector has a duplicate, push it to array, find its duplicate in a map and combine their properties
 			if(map.has(selector)){
 				duplicates.push(i);
-				logFile+=("Selector '"+selector+"' was duplicated.\n\n");
+				logFileV+=("Selector '"+selector+"' was duplicated.\n\n");
 				var old=sheet.rules[map.get(selector)].declarations;
 				var newDec=	sheet.rules[i].declarations;
 				for(i in newDec){
@@ -1301,7 +1626,7 @@ function findDuplicate(sheet){
 	for(var i=duplicates.length-1;i>=0;i--){
 		(sheet.rules).splice(duplicates[i],1);
 	}
-	logFile+="\n\n";
+	logFileV="\n\n";
 }
 
 //function for finding and combining nested duplicated selectors. The procedure is the same as for unnested selectors.
@@ -1309,7 +1634,7 @@ function duplicatesNested(selector,i,j,sheet,map,duplicates){
 	map.clear();
 	if(map.has(selector)){
 		duplicates.push(j);
-		logFile+=("Selector '"+selector+"' was duplicated.\n\n");
+		logFileV+=("Selector '"+selector+"' was duplicated.\n\n");
 		var old=sheet.rules[i].rules[map.get(selector)].declarations;
 		var newDec=	sheet.rules[i].rules[j].declarations;
 		for(d in newDec){
@@ -1375,6 +1700,17 @@ function DamerauLevenshteinDistance(s, t) {
         }
     }
 	return d[n][m];
+}
+
+
+function contains(array,s) {
+    // compare lengths - can save a lot of time
+    for (var i = 0, l=array.length; i < l; i++) {
+        if (array[i] == s) {
+            return  true;
+        }
+    }
+    return false;
 }
 
 //an object with all html tags and their attributes

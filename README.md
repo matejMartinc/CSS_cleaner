@@ -20,46 +20,40 @@ and it does not check for asynchronically added HTML or imported CSS files.
 What are the requirements:
 --------------------------
 
-Node.js and Jquery. If you pull this program from here, you get all the required node modules and jquery library.
+Node.js and Jquery. Required node modules are specified in package.json.
 
 How to use it?
 --------------
 
-Open command prompt, go to directory with a program and type:
+Import module with:
+```
+var css_cleaner = require('css_cleaner.js');
+```
 
-node css_cleaner.js url
 
-where url is url of a html document.
 
 examples:
 ---------
 
-node css_cleaner.js http://www.mypage.com
+Call the main function that does all the work:
+```
+css_cleaner.main(urlList);
+```
+where urlList is an array of url's that you wish to clean.
 
-You can also specify some options:
+Main function takes additional arguments:
+```
+css_cleaner.main(url, distance, deletion, simplification, compression);
+```
+Distance: int type. Only fix selectors that differ from correct selector in specified number of letters - the difference is calculated with Damerau-Levensthein difference. 0 means selectors will not be replaced and 
+default(no argument) is 2.
 
-node css_cleaner.js url 1
+Deletion: boolean type. Choose to delete unused selectors. Default is true.
 
-This will only fix selectors that differ from correct selector in one letter - the difference is
-calculated with Damerau-Levensthein difference. 0 means selectors will not be replaced and default(no argument) is 5.
+Simplification: boolean type. Choose to  simplify selectors. If you will
+be having performance issues, try turning simplification off.Deleting and simplifying are by far the slowest operations, since they relly on jquery. Default is true.
 
-node css_cleaner.js url 5 deletionOff
-
-deletionOff is an argument that tells the program not to delete unused selectors. Default is deletionOn.
-
-node css_cleaner.js url 5 deletionOn simplificationOff
-
-the simplificationOff is an argument that tells the program not to simplify selectors. If you will
-be having performance issues, try calling
-
-node css_cleaner.js url 5 deletionOff simplificationOff
-
-Deleting and simplifying are by far the slowest operations, since they relly on jquery.
-
-node css_cleaner.js url 5 deletionOn simplificationOn compressionOn
-
-The last argument compressionOn tells the program to compress the css file for production use (it basicaly removes all the white space and page breaks).
-Default is compressionOff.
+Compression: boolean type. Choose to compress the css file for production use (it basicaly removes all the white space and page breaks). Default is true.
 
 What is the result?
 -------------------
